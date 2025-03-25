@@ -26,7 +26,7 @@ export const cardiologyBoard: BoardData = {
         "HCARTS",
         "EATDOY",
         "ORDILS",
-        "LTIOLE",
+        "LTIOEE",  // Fixed from LTIOLE to match the image
         "ESALVC",
         "STOLRO",
         "NEGANO",
