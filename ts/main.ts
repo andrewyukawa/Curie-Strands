@@ -639,7 +639,7 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        console.log("Starting hint system with path-based highlighting...");
+        console.log("Starting hint system with path-based highlighting and connectors...");
         
         // First check if there are any unfound theme words
         let unfoundThemeWords = [];
@@ -664,34 +664,53 @@ class GameBoard {
         const coords = this._board.themeCoords[themeWord];
         console.log(`Hint for ${themeWord} using coords:`, coords);
         
-        // Clear any existing hints
-        document.querySelectorAll(".hinted").forEach(el => {
+        // Clear any existing hints and connectors
+        document.querySelectorAll(".hinted, .hint-connector").forEach(el => {
             try {
                 el.classList.remove("hinted");
-                const inner = el.querySelector(".inner");
-                if (inner) inner.classList.remove("hinted");
+                el.classList.remove("hint-connector");
+                
+                // If this is a connector element, remove it
+                if (el.classList.contains("connector")) {
+                    el.parentNode?.removeChild(el);
+                }
             } catch (e) {
                 console.error("Error clearing hints", e);
             }
         });
         
-        // FIXED APPROACH: Only highlight the exact cells in the path
-        // Go through each coordinate in the theme word path
-        for (const [y, x] of coords) {
+        // Also clear any inner elements
+        document.querySelectorAll(".inner.hinted").forEach(el => {
             try {
+                el.classList.remove("hinted");
+            } catch (e) {
+                console.error("Error clearing inner hints", e);
+            }
+        });
+        
+        // Highlight the path cells and add connectors between them
+        for (let i = 0; i < coords.length; i++) {
+            try {
+                const [y, x] = coords[i];
+                
                 // Find the element at this coordinate
-                // Our grid is organized as grid[y][x]
                 const el = this._grid[y][x];
                 if (el) {
                     console.log(`Highlighting path cell at [${y},${x}]`);
                     el.classList.add("hinted");
                     const inner = el.querySelector(".inner");
                     if (inner) inner.classList.add("hinted");
+                    
+                    // Add connector to the next cell in the path (if not the last cell)
+                    if (i < coords.length - 1) {
+                        const [nextY, nextX] = coords[i + 1];
+                        this._addHintConnector(el, y, x, nextY, nextX);
+                    }
                 } else {
                     console.error(`Element at [${y},${x}] not found`);
                 }
             } catch (e) {
-                console.error(`Error highlighting coordinate [${y},${x}]`, e);
+                console.error(`Error highlighting coordinate or adding connector`, e);
             }
         }
         
@@ -702,7 +721,43 @@ class GameBoard {
         this._wordsRemainingForHint = this.wordsToGetHint;
         this.updateWordCount();
         
-        console.log(`Hint for ${themeWord} completed`);
+        console.log(`Hint for ${themeWord} completed with connectors`);
+    }
+    
+    /**
+     * Adds a connector element between two cells for hint paths
+     */
+    private _addHintConnector(fromEl: HTMLElement, fromY: number, fromX: number, toY: number, toX: number) {
+        // Create a new connector element
+        const connector = document.createElement("div");
+        connector.className = "connector hint-connector";
+        
+        // Determine the type of connector based on direction
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        
+        if (dx === 0 && dy === 1) {
+            connector.classList.add("d");
+        } else if (dx === 0 && dy === -1) {
+            connector.classList.add("u");
+        } else if (dx === 1 && dy === 0) {
+            connector.classList.add("r");
+        } else if (dx === -1 && dy === 0) {
+            connector.classList.add("l");
+        } else if (dx === 1 && dy === 1) {
+            connector.classList.add("dr");
+        } else if (dx === -1 && dy === 1) {
+            connector.classList.add("dl");
+        } else if (dx === 1 && dy === -1) {
+            connector.classList.add("ur");
+        } else if (dx === -1 && dy === -1) {
+            connector.classList.add("ul");
+        }
+        
+        // Add the connector to the from element
+        fromEl.appendChild(connector);
+        
+        return connector;
     }
     
     private _debugGrid() {
