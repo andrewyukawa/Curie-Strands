@@ -1,4 +1,4 @@
-// Common 4+ letter English words dictionary
+// Enhanced Dictionary for word validation
 // This will be used to validate word submissions beyond the explicit solutions list
 
 export class Dictionary {
@@ -40,7 +40,6 @@ export class Dictionary {
 }
 
 // List of common English words (4+ letters)
-// This is just a starter list - in a production app, you'd use a more comprehensive dictionary
 const COMMON_ENGLISH_WORDS: string[] = [
     // A
     "ABLE", "ACID", "ALSO", "AREA", "ARMY", "AWAY", "ABOUT", "ABOVE", "ACROSS", "AFTER", "AGAIN", "AGAINST", "AHEAD", "ALLOW", "ALONE", "ALONG", "AMONG", "ANGLE", "ANGRY", "ANIMAL", "ANSWER", "APART", "APPLE", "APPLY",
@@ -88,7 +87,7 @@ const COMMON_ENGLISH_WORDS: string[] = [
     "OFFS", "ONCE", "ONLY", "ONTO", "OPEN", "ORAL", "OVER", "OVEN", "OVAL", "OURS",
     
     // P
-    "PACK", "PAGE", "PAID", "PAIN", "PAIR", "PART", "PASS", "PAST", "PATH", "PLAN", "PLAY", "PLUS", "POOR", "PORT", "POST", "PULL", "PURE", "PUSH", "PUTS", "PACE", "PALE", "PALM", "PARK", "PAWN", "PEAK", "PICK", "PIER", "PILE", "PINE", "PINK", "PIPE", "PLAN", "PLAY", "PLOT", "PLUG", "PLUS", "POEM", "POET", "POLE", "POLL", "POLO", "POND", "POOL", "POOR", "POPE", "POSE", "POST", "POUR", "PRAY", "PREY", "PROF", "PUMP", "PURE",
+    "PACK", "PAGE", "PAID", "PAIN", "PAIR", "PART", "PASS", "PAST", "PATH", "PLAN", "PLAY", "PLUS", "POOR", "PORT", "POST", "PULL", "PURE", "PUSH", "PUTS", "PACE", "PALE", "PALM", "PARK", "PAWN", "PEAK", "PICK", "PIER", "PILE", "PINE", "PINK", "PIPE", "PLAN", "PLAY", "PLOT", "PLUG", "PLUS", "POEM", "POET", "POLE", "POLL", "POLO", "POND", "POOL", "POOR", "POPE", "PORT", "POSE", "POST", "POUR", "PRAY", "PREY", "PROF", "PUMP", "PURE",
     
     // Q
     "QUIT", "QUITE", "QUIZ",

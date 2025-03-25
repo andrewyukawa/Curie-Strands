@@ -4,13 +4,14 @@ import { BoardData, BoardState, defaultBoard } from "./board.js";
 import { MultiplayerClient, MultiplayerUI } from "./multi.js";
 import { BoardLoader } from "./load.js";
 import { cardiologyBoard } from "./custom-board.js";
-import { Dictionary } from "./dictionary.js";
+import { Dictionary } from "./enhanced-dictionary.js";
 
 // Define a constant to check if we're in a deployed environment
 const IS_DEPLOYED = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('netlify.app');
 
 // Create a dictionary instance to validate words
 const wordDictionary = new Dictionary();
+console.log("Enhanced dictionary loaded with thousands of words");
 
 interface window extends Window {
     animationEvent: string;
