@@ -413,15 +413,14 @@ class GameBoard {
     private validateGuess(word: string): number {
         let ret = 0;
         if (this._board.solutions.includes(word)) ret += 1;
-        // Spangram is sometimes a combination of multiple "solutions", so might not be in the list as-is.
-        // else return ret;
+        
+        // Check if it's a spangram first
         if (this._board.spangram == word) {
-            // ret += 2;
-            ret = 3;
-            return ret;
+            return 3; // Spangram
         }
-        if (ret == 0) return ret;
-        if (word in this._board.themeCoords) {
+        
+        // If it's a valid word (ret == 1), check if it's a theme word
+        if (ret == 1 && word in this._board.themeCoords) {
             let coords = this._board.themeCoords[word];
             let match = true;
             for (let i = 0; i < coords.length; i++) {
@@ -440,8 +439,9 @@ class GameBoard {
                     break;
                 }
             }
-            if (match) ret += 1;
+            if (match) ret += 1; // Increase to 2 for a theme word
         }
+        
         return ret;
     }
 
@@ -477,29 +477,45 @@ class GameBoard {
         if (!remote) this._m.cli.cmdEndGuess();
         this._formingGuess = false;
         this._inHover = false;
-        if (this._selected.length == 1) return;
+        if (this._selected.length == 1) return false;
+        
         let word = this._collectGuess();
         let guessValidity = this.validateGuess(word);
-        if (guessValidity == 1) {
-            let wrong = false;
-            if (!this._wordsFound.includes(word)) {
-                this._wordsFound.push(word);
-                this._wordsRemainingForHint -= 1;
-            } else {
-                this._mb.msg("Already done");
-                wrong = true;
+        
+        if (guessValidity > 0) { // If the word is valid in any way
+            if (this._wordsFound.includes(word)) {
+                // Already found this word
+                this._mb.msg("Already found", "var(--color-warn)");
+                this._clear(true, false, true);
+                return false;
             }
-            this._clear(true, false, wrong);
-            this.updateWordCount();
-        } else if (guessValidity == 2) {
-            this._mb.msg("Nice!", "var(--color-valid)");
-            this.selectThemeWordByCoords(word, this._selected);
-        } else if (guessValidity == 3) {
-            this._mb.msg("Spangram!", "var(--color-spangram)");
-            this.selectSpangramByCoords(this._selected);
+            
+            // Add to found words regardless of type
+            this._wordsFound.push(word);
+            
+            if (guessValidity == 1) { // Regular word (not theme or spangram)
+                this._mb.msg("Good!", "var(--color-valid)");
+                this._wordsRemainingForHint -= 1;
+                this._clear(true, false, false);
+                this.updateWordCount();
+                return true;
+            } else if (guessValidity == 2) { // Theme word
+                this._mb.msg("Theme word!", "var(--color-valid)");
+                this.selectThemeWordByCoords(word, this._selected);
+                return true;
+            } else if (guessValidity == 3) { // Spangram
+                this._mb.msg("Spangram!", "var(--color-spangram)");
+                this.selectSpangramByCoords(this._selected);
+                return true;
+            }
         } else {
+            // Invalid word
+            this._mb.msg("Not in word list", "var(--color-warn)");
             this._clear(true, false, true);
+            return false;
         }
+        
+        return false;
     }
 
     animateSelected = (el: HTMLElement) => {
