@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="100%" height="100%" viewBox="0 0 512 512" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
-    <defs>
-        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" style="stop-color:#1952E4;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#8841E4;stop-opacity:1" />
-        </linearGradient>
-    </defs>
+<svg width="100%" height="100%" viewBox="0 0 300 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+    <!-- Dark background rectangle -->
+    <rect x="0" y="0" width="300" height="80" fill="#1a1a2e" />
     
-    <!-- Simple C shape with gradient fill -->
-    <path d="M400,256 C400,339.443 333.443,406 250,406 C166.557,406 100,339.443 100,256 C100,172.557 166.557,106 250,106 C333.443,106 400,172.557 400,256 Z" 
-          fill="url(#gradient)" stroke="none" />
-    
-    <!-- Inner white circle -->
-    <circle cx="250" cy="256" r="90" fill="white" />
+    <!-- Curie Logo Group -->
+    <g transform="translate(20, 15)">
+        <!-- C Logo -->
+        <g transform="scale(0.5)">
+            <!-- Blue C shape -->
+            <path d="M80,40 C80,62.091 62.091,80 40,80 C17.909,80 0,62.091 0,40 C0,17.909 17.909,0 40,0 C62.091,0 80,17.909 80,40 Z" 
+                  fill="#4B56D2" stroke="none" />
+        </g>
+        
+        <!-- Curie Text -->
+        <text x="50" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">Curie</text>
+    </g>
 </svg> 
