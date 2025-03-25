@@ -4,9 +4,13 @@ import { BoardData, BoardState, defaultBoard } from "./board.js";
 import { MultiplayerClient, MultiplayerUI } from "./multi.js";
 import { BoardLoader } from "./load.js";
 import { cardiologyBoard } from "./custom-board.js";
+import { Dictionary } from "./dictionary.js";
 
 // Define a constant to check if we're in a deployed environment
 const IS_DEPLOYED = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('netlify.app');
+
+// Create a dictionary instance to validate words
+const wordDictionary = new Dictionary();
 
 interface window extends Window {
     animationEvent: string;
@@ -411,16 +415,13 @@ class GameBoard {
 
     // 0 = Invalid. 1 = Valid word, you get a point towards hints. 2 = Valid theme word, 3 = Valid spangram.
     private validateGuess(word: string): number {
-        let ret = 0;
-        if (this._board.solutions.includes(word)) ret += 1;
-        
-        // Check if it's a spangram first
+        // Check if it's the spangram first
         if (this._board.spangram == word) {
             return 3; // Spangram
         }
         
-        // If it's a valid word (ret == 1), check if it's a theme word
-        if (ret == 1 && word in this._board.themeCoords) {
+        // Check if it's a theme word with correct coordinates
+        if (word in this._board.themeCoords) {
             let coords = this._board.themeCoords[word];
             let match = true;
             for (let i = 0; i < coords.length; i++) {
@@ -439,10 +440,20 @@ class GameBoard {
                     break;
                 }
             }
-            if (match) ret += 1; // Increase to 2 for a theme word
+            if (match) return 2; // Theme word
         }
         
-        return ret;
+        // Check if it's in the solutions list (legacy support)
+        if (this._board.solutions.includes(word)) {
+            return 1; // Valid non-theme word
+        }
+        
+        // Check if it's a valid word in our dictionary
+        if (wordDictionary.isValidWord(word)) {
+            return 1; // Valid non-theme word from dictionary
+        }
+        
+        return 0; // Invalid word
     }
 
     private addConnector(el: HTMLElement, elCoord: number[], prevCoord: number[]) {
