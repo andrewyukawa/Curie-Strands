@@ -12,6 +12,8 @@
     --color-valid: #94BBE9;
     --color-spangram: #EECE23;
     --color-selected: #B5BAC0;
+    --color-hint: #FF8C42;
+    --color-warn: #FF6B6B;
 }
 
 /* body {
@@ -36,7 +38,7 @@
 }
 
 .char .hinted {
-    border: 0.25rem dashed var(--color-valid);
+    border: 0.25rem dashed var(--color-hint);
 }
 
 .char .selected {

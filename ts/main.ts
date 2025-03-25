@@ -638,16 +638,35 @@ class GameBoard {
 
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
+        
+        // Find a theme word that hasn't been found yet
         let themeWord = "";
         for (const tw in this._board.themeCoords) {
             if (this._themeWordsFound.includes(tw)) continue;
             themeWord = tw;
             break;
         }
-        for (const c of this._board.themeCoords[themeWord]) {
+        
+        // If all theme words are found, return without doing anything
+        if (!themeWord) {
+            this._mb.msg("All theme words found!", "var(--color-valid)");
+            return;
+        }
+        
+        // Clear any existing hints first
+        for (let y = 0; y < this._board.startingBoard.length; y++) {
+            for (let x = 0; x < this._board.startingBoard[y].length; x++) {
+                this.rmClass(this._grid[y][x], "hinted");
+            }
+        }
+        
+        // Add hints for the theme word
+        const coords = this._board.themeCoords[themeWord];
+        for (const c of coords) {
             this.addClass(this._grid[c[0]][c[1]], "hinted");
         }
-
+        
+        this._mb.msg(`Hint for: ${themeWord}`, "var(--color-hint)");
         this._wordsRemainingForHint = this.wordsToGetHint;
         this.updateWordCount();
     }
