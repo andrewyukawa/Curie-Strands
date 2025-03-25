@@ -657,13 +657,43 @@ class GameBoard {
         for (let y = 0; y < this._board.startingBoard.length; y++) {
             for (let x = 0; x < this._board.startingBoard[y].length; x++) {
                 this.rmClass(this._grid[y][x], "hinted");
+                // Also clear any hint connectors
+                const el = this._grid[y][x];
+                const connectors = el.querySelectorAll(".hint-connector");
+                connectors.forEach(conn => conn.remove());
             }
         }
         
-        // Add hints for the theme word
+        // Add hints for the selected theme word only
         const coords = this._board.themeCoords[themeWord];
+        
+        // First pass: add the hinted class to all letters
         for (const c of coords) {
             this.addClass(this._grid[c[0]][c[1]], "hinted");
+        }
+        
+        // Second pass: add connectors between adjacent letters
+        for (let i = 1; i < coords.length; i++) {
+            const prevCoord = coords[i-1];
+            const curCoord = coords[i];
+            const el = this._grid[curCoord[0]][curCoord[1]];
+            
+            // Add a connector between this letter and the previous one
+            let con = document.createElement("div");
+            con.classList.add("connector", "hint-connector");
+            
+            // Calculate direction from previous to current
+            let deltaY = curCoord[0] - prevCoord[0];
+            let deltaX = curCoord[1] - prevCoord[1];
+            let conClass = "";
+            if (deltaY > 0) conClass += "u";
+            else if (deltaY < 0) conClass += "d";
+            if (deltaX > 0) conClass += "l";
+            else if (deltaX < 0) conClass += "r";
+            if (conClass != "") con.classList.add(conClass);
+            
+            // Add connector to the element
+            el.appendChild(con);
         }
         
         this._mb.msg(`Hint for: ${themeWord}`, "var(--color-hint)");

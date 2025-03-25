@@ -133,3 +133,8 @@
     transform: rotate(45deg);
     right: 2.5em;
 }
+
+.connector.hint-connector {
+    background-color: var(--color-hint);
+    opacity: 0.7;
+}
