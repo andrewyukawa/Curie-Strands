@@ -639,7 +639,7 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        console.log("Starting hint system with correct grid access...");
+        console.log("Starting hint system with corrected coordinates...");
         
         // First check if there are any unfound theme words
         let unfoundThemeWords = [];
@@ -649,8 +649,6 @@ class GameBoard {
                 unfoundThemeWords.push(tw);
             }
         }
-        
-        console.log("Unfound theme words:", unfoundThemeWords);
         
         // If no unfound theme words, show message and return
         if (unfoundThemeWords.length === 0) {
@@ -673,42 +671,18 @@ class GameBoard {
         const coords = this._board.themeCoords[themeWord];
         console.log(`Theme word "${themeWord}" coordinates:`, coords);
         
-        // We'll manually reconstruct what a VALVE should be
-        if (themeWord === "VALVE") {
-            // The coordinates you provided in the screenshot
-            const manualCoords = [
-                [4, 4], // V
-                [5, 4], // A
-                [4, 5], // L
-                [5, 5], // V
-                [4, 6]  // E
-            ];
-            
-            console.log("Using manual coordinates for VALVE:", manualCoords);
-            
-            for (const [y, x] of manualCoords) {
-                try {
-                    const el = this._grid[y][x];
+        // Add highlights for the theme word coordinates
+        for (const [y, x] of coords) {
+            try {
+                const el = this._grid[y][x];
+                if (el) {
                     console.log(`Highlighting cell at [${y},${x}]`);
                     this.addClass(el, "hinted");
-                } catch (error) {
-                    console.error(`Error highlighting cell at [${y},${x}]`, error);
+                } else {
+                    console.error(`Element at [${y},${x}] is undefined`);
                 }
-            }
-        } else {
-            // Add highlights for the theme word coordinates
-            for (const [y, x] of coords) {
-                try {
-                    const el = this._grid[y][x];
-                    if (el) {
-                        console.log(`Highlighting cell at [${y},${x}]`);
-                        this.addClass(el, "hinted");
-                    } else {
-                        console.error(`Element at [${y},${x}] is undefined`);
-                    }
-                } catch (error) {
-                    console.error(`Error highlighting cell at [${y},${x}]`, error);
-                }
+            } catch (error) {
+                console.error(`Error highlighting cell at [${y},${x}]`, error);
             }
         }
         
