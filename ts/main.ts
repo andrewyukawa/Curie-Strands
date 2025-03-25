@@ -4,7 +4,8 @@ import { BoardData, BoardState, defaultBoard } from "./board.js";
 import { MultiplayerClient, MultiplayerUI } from "./multi.js";
 import { BoardLoader } from "./load.js";
 import { cardiologyBoard } from "./custom-board.js";
-import { Dictionary } from "./enhanced-dictionary.js";
+import { Dictionary } from "./expanded-dictionary.js";
+console.log("Expanded dictionary loaded with 10,000+ words");
 
 // Define a constant to check if we're in a deployed environment
 const IS_DEPLOYED = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('netlify.app');
