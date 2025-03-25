@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100%" height="100%" viewBox="0 0 1350 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">
+    <style>
+        .title {
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            font-size: 72px;
+            fill: #1952E4;
+        }
+        .strand-circle {
+            stroke-width: 2;
+            stroke: #888;
+        }
+        .blue-circle {
+            fill: #7FB3F5;
+        }
+        .yellow-circle {
+            fill: #F5E17F;
+        }
+        .strand-line {
+            stroke-width: 5;
+            stroke-linecap: round;
+            fill: none;
+        }
+        .blue-line {
+            stroke: #7FB3F5;
+        }
+        .yellow-line {
+            stroke: #F5E17F;
+        }
+        .letter {
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            font-size: 36px;
+            fill: #333;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+    </style>
+    
+    <!-- Game Title -->
+    <text x="675" y="100" class="title" text-anchor="middle">CURIE STRANDS</text>
+    
+    <!-- Example Spangram Visualization -->
+    <!-- F -->
+    <circle cx="175" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="175" y="225" class="letter">F</text>
+    
+    <!-- I -->
+    <circle cx="250" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="250" y="225" class="letter">I</text>
+    
+    <!-- L -->
+    <circle cx="325" cy="225" r="30" class="strand-circle yellow-circle" />
+    <text x="325" y="225" class="letter">L</text>
+    
+    <!-- A -->
+    <circle cx="400" cy="225" r="30" class="strand-circle yellow-circle" />
+    <text x="400" y="225" class="letter">A</text>
+    
+    <!-- M -->
+    <circle cx="475" cy="225" r="30" class="strand-circle yellow-circle" />
+    <text x="475" y="225" class="letter">M</text>
+    
+    <!-- E -->
+    <circle cx="550" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="550" y="225" class="letter">E</text>
+    
+    <!-- N -->
+    <circle cx="625" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="625" y="225" class="letter">N</text>
+    
+    <!-- T -->
+    <circle cx="700" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="700" y="225" class="letter">T</text>
+    
+    <!-- S -->
+    <circle cx="775" cy="225" r="30" class="strand-circle blue-circle" />
+    <text x="775" y="225" class="letter">S</text>
+    
+    <!-- Connection Lines -->
+    <path d="M175,225 L250,225" class="strand-line blue-line" />
+    <path d="M250,225 L325,225" class="strand-line yellow-line" />
+    <path d="M325,225 L400,225" class="strand-line yellow-line" />
+    <path d="M400,225 L475,225" class="strand-line yellow-line" />
+    <path d="M475,225 L550,225" class="strand-line blue-line" />
+    <path d="M550,225 L625,225" class="strand-line blue-line" />
+    <path d="M625,225 L700,225" class="strand-line blue-line" />
+    <path d="M700,225 L775,225" class="strand-line blue-line" />
+</svg> 
