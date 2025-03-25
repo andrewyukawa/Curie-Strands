@@ -97,6 +97,11 @@ class GameBoard {
     
     private _mb: MessageBox;
 
+    // Track the current theme word being hinted
+    private _currentHintWord: string | null = null;
+    // Track if we're showing the full path (second hint)
+    private _showingHintPath: boolean = false;
+
     constructor(el: HTMLElement, clue: HTMLElement, guess: HTMLElement, wordCount: HTMLElement, hintButton: HTMLElement, messageBox: HTMLElement, board: BoardData) {
         this._el = el;
         this._clue = clue;
@@ -639,7 +644,7 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        console.log("Starting hint system with path-based highlighting and connectors...");
+        console.log("Starting hint system with two-stage process...");
         
         // First check if there are any unfound theme words
         let unfoundThemeWords = [];
@@ -656,14 +661,33 @@ class GameBoard {
             return;
         }
         
-        // Choose the first unfound theme word
-        const themeWord = unfoundThemeWords[0];
-        console.log("Selected theme word for hint:", themeWord);
+        // Clear any existing hints and connectors
+        this._clearAllHints();
         
-        // Get the exact coordinates for this theme word
-        const coords = this._board.themeCoords[themeWord];
-        console.log(`Hint for ${themeWord} using coords:`, coords);
+        // Choose the first unfound theme word if we don't have a current hint
+        // or move to the second stage of the current hint
+        if (!this._currentHintWord || !unfoundThemeWords.includes(this._currentHintWord)) {
+            // First stage - show just the letters
+            this._currentHintWord = unfoundThemeWords[0];
+            this._showingHintPath = false;
+            console.log("First hint stage for:", this._currentHintWord);
+            this._showHintLetters(this._currentHintWord);
+        } else {
+            // Second stage - show the path order with connectors
+            this._showingHintPath = true;
+            console.log("Second hint stage for:", this._currentHintWord);
+            this._showHintPath(this._currentHintWord);
+        }
         
+        // Reset the hint counter
+        this._wordsRemainingForHint = this.wordsToGetHint;
+        this.updateWordCount();
+    }
+    
+    /**
+     * Clears all hints and connectors from the board
+     */
+    private _clearAllHints() {
         // Clear any existing hints and connectors
         document.querySelectorAll(".hinted, .hint-connector").forEach(el => {
             try {
@@ -687,8 +711,57 @@ class GameBoard {
                 console.error("Error clearing inner hints", e);
             }
         });
+    }
+    
+    /**
+     * First hint stage: Highlight just the letters of the theme word (no order)
+     */
+    private _showHintLetters(themeWord: string) {
+        // Get the coordinates for this theme word
+        const coords = this._board.themeCoords[themeWord];
+        console.log(`First hint for ${themeWord} (letters only)`, coords);
         
-        // Highlight the path cells and add connectors between them
+        // Extract all unique coordinates to highlight
+        const cellsToHighlight = new Set<string>();
+        
+        // Add all cells to the set (using string representation for uniqueness)
+        for (const [y, x] of coords) {
+            cellsToHighlight.add(`${y},${x}`);
+        }
+        
+        // Highlight each unique cell
+        for (const coordStr of cellsToHighlight) {
+            try {
+                const [y, x] = coordStr.split(',').map(Number);
+                
+                // Find the element at this coordinate
+                const el = this._grid[y][x];
+                if (el) {
+                    console.log(`Highlighting letter at [${y},${x}]`);
+                    el.classList.add("hinted");
+                    const inner = el.querySelector(".inner");
+                    if (inner) inner.classList.add("hinted");
+                } else {
+                    console.error(`Element at [${y},${x}] not found`);
+                }
+            } catch (e) {
+                console.error(`Error highlighting letter`, e);
+            }
+        }
+        
+        // Display a message about the hint
+        this._mb.msg(`Hint: letters of ${themeWord}`, "var(--color-hint)");
+    }
+    
+    /**
+     * Second hint stage: Show the complete path with connectors
+     */
+    private _showHintPath(themeWord: string) {
+        // Get the coordinates for this theme word
+        const coords = this._board.themeCoords[themeWord];
+        console.log(`Second hint for ${themeWord} (with path)`, coords);
+        
+        // Highlight all cells in order and add connectors
         for (let i = 0; i < coords.length; i++) {
             try {
                 const [y, x] = coords[i];
@@ -710,18 +783,12 @@ class GameBoard {
                     console.error(`Element at [${y},${x}] not found`);
                 }
             } catch (e) {
-                console.error(`Error highlighting coordinate or adding connector`, e);
+                console.error(`Error highlighting path or adding connector`, e);
             }
         }
         
         // Display a message about the hint
-        this._mb.msg(`Hint: ${themeWord}`, "var(--color-hint)");
-        
-        // Reset the hint counter
-        this._wordsRemainingForHint = this.wordsToGetHint;
-        this.updateWordCount();
-        
-        console.log(`Hint for ${themeWord} completed with connectors`);
+        this._mb.msg(`Hint: path for ${themeWord}`, "var(--color-hint)");
     }
     
     /**
