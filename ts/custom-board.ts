@@ -12,7 +12,7 @@ export const spangramCoords = [
     [4, 4], // L
     [4, 5], // O
     [4, 6], // G
-    [4, 7]  // Y
+    [7, 1]  // Y - Using the first Y in the last row (second position)
 ];
 
 export const cardiologyBoard: BoardData = {
@@ -53,6 +53,6 @@ export const cardiologyBoard: BoardData = {
         "SYSTOLE": [[5, 5], [2, 5], [5, 4], [5, 3], [4, 3], [3, 3], [3, 4]],
         "DIASTOLE": [[2, 1], [2, 2], [6, 2], [5, 2], [0, 3], [5, 3], [3, 3], [4, 2]],
         "HEART": [[0, 0], [1, 0], [6, 0], [2, 0], [0, 3]],
-        "CORONARY": [[5, 5], [5, 6], [5, 4], [5, 3], [6, 3], [6, 4], [2, 5], [7, 5]]
+        "CORONARY": [[5, 5], [5, 6], [5, 4], [5, 3], [6, 3], [6, 4], [2, 5], [7, 4]] // Fixed to use the second Y (position [7, 4])
     }
 }; 
