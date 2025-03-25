@@ -639,7 +639,32 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        // First, check if there are already hints showing
+        // First check if there are any unfound theme words
+        let unfoundThemeWords = [];
+        for (const tw in this._board.themeCoords) {
+            // Only consider theme words, not the spangram
+            if (!this._themeWordsFound.includes(tw) && tw !== this._board.spangram) {
+                unfoundThemeWords.push(tw);
+            }
+        }
+        
+        // If no unfound theme words, show message and return
+        if (unfoundThemeWords.length === 0) {
+            this._mb.msg("All theme words found!", "var(--color-valid)");
+            return;
+        }
+        
+        // Clear any existing hints first
+        for (let y = 0; y < this._board.startingBoard.length; y++) {
+            for (let x = 0; x < this._board.startingBoard[y].length; x++) {
+                this.rmClass(this._grid[y][x], "hinted");
+                const el = this._grid[y][x];
+                const connectors = el.querySelectorAll(".hint-connector");
+                connectors.forEach(conn => conn.remove());
+            }
+        }
+        
+        // Check if there are already hints on the board
         let hintsAlreadyActive = false;
         for (let y = 0; y < this._board.startingBoard.length; y++) {
             for (let x = 0; x < this._board.startingBoard[y].length; x++) {
@@ -651,53 +676,29 @@ class GameBoard {
             if (hintsAlreadyActive) break;
         }
         
-        // Select the next unfound theme word
-        let themeWordsToHint = [];
-        for (const tw in this._board.themeCoords) {
-            if (!this._themeWordsFound.includes(tw) && tw !== this._board.spangram) {
-                themeWordsToHint.push(tw);
-            }
-        }
+        // Choose the first unfound theme word
+        const themeWord = unfoundThemeWords[0];
         
-        // If no theme words left to hint, show message
-        if (themeWordsToHint.length === 0) {
-            this._mb.msg("All theme words found!", "var(--color-valid)");
-            return;
-        }
-        
-        // Choose a theme word to hint (first unfound theme word)
-        const themeWord = themeWordsToHint[0];
+        // Get the exact coordinates for this theme word from themeCoords
         const coords = this._board.themeCoords[themeWord];
         
-        // Clear any existing hints first
-        for (let y = 0; y < this._board.startingBoard.length; y++) {
-            for (let x = 0; x < this._board.startingBoard[y].length; x++) {
-                // Clear hint classes and connectors
-                this.rmClass(this._grid[y][x], "hinted");
-                const el = this._grid[y][x];
-                const connectors = el.querySelectorAll(".hint-connector");
-                connectors.forEach(conn => conn.remove());
-            }
-        }
+        console.log(`Hinting for word: ${themeWord} with coords:`, coords);
         
-        // If this is the first hint for a word, just highlight the letters
+        // If first hint, just highlight the letters
         if (!hintsAlreadyActive) {
-            // Just highlight all the letters without order
             for (const coord of coords) {
-                const [y, x] = coord;
-                this.addClass(this._grid[y][x], "hinted");
+                this.addClass(this._grid[coord[0]][coord[1]], "hinted");
             }
             this._mb.msg(`Hint: ${themeWord}`, "var(--color-hint)");
         } 
-        // If this is a subsequent hint, show the letter order
+        // If subsequent hint, show the letter order
         else {
-            // First highlight all letters
+            // Highlight all letters first
             for (const coord of coords) {
-                const [y, x] = coord;
-                this.addClass(this._grid[y][x], "hinted");
+                this.addClass(this._grid[coord[0]][coord[1]], "hinted");
             }
             
-            // Then add connectors to show the order
+            // Then add connectors to show order
             for (let i = 1; i < coords.length; i++) {
                 const prevCoord = coords[i-1];
                 const curCoord = coords[i];
