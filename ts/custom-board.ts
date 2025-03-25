@@ -59,54 +59,54 @@ export const cardiologyBoard: BoardData = {
     ],
     themeCoords: {
         "CARDIOLOGY": spangramCoords,
-        // Carefully revised coordinates based on the actual board layout
+        // Corrected coordinates for all theme words to ensure connected paths
         "VALVE": [
             [4, 4], // V
-            [4, 2], // A
-            [4, 3], // L
-            [4, 4], // V
-            [3, 4]  // E
+            [4, 3], // A
+            [4, 2], // L 
+            [3, 4], // V
+            [2, 4]  // E
         ],
         "STENT": [
-            [0, 5], // S
+            [5, 0], // S
             [5, 1], // T
-            [1, 2], // E
-            [6, 0], // N
-            [5, 1]  // T
+            [4, 1], // E - Fixed to use E at row 4, col 1
+            [6, 0], // N 
+            [7, 0]  // T - Fixed to use T at row 7, col 0
         ],
         "SYSTOLE": [
             [0, 5], // S
             [1, 5], // Y
-            [0, 5], // S
-            [5, 1], // T
-            [2, 4], // O
+            [2, 5], // S - Fixed to use S at row 2, col 5
+            [3, 5], // T - Fixed to use T at row 3, col 5
+            [3, 3], // O
             [4, 3], // L
             [3, 4]  // E
         ],
         "DIASTOLE": [
             [1, 3], // D
             [2, 3], // I
-            [4, 2], // A
-            [0, 5], // S
-            [5, 1], // T
-            [2, 4], // O
+            [1, 2], // A
+            [2, 5], // S
+            [3, 5], // T
+            [3, 3], // O
             [4, 3], // L
             [3, 4]  // E
         ],
         "HEART": [
             [0, 0], // H
             [1, 0], // E
-            [4, 2], // A
+            [1, 2], // A
             [0, 3], // R
-            [5, 1]  // T
+            [0, 4]  // T - Fixed to use T at row 0, col 4
         ],
         "CORONARY": [
             [4, 5], // C
-            [2, 4], // O
+            [5, 3], // O
             [0, 3], // R
-            [2, 4], // O
+            [3, 3], // O
             [6, 0], // N
-            [4, 2], // A
+            [1, 2], // A
             [0, 3], // R
             [1, 5]  // Y
         ]

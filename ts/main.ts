@@ -639,7 +639,7 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        console.log("Starting completely redesigned hint system...");
+        console.log("Starting hint system with path-based highlighting...");
         
         // First check if there are any unfound theme words
         let unfoundThemeWords = [];
@@ -660,6 +660,10 @@ class GameBoard {
         const themeWord = unfoundThemeWords[0];
         console.log("Selected theme word for hint:", themeWord);
         
+        // Get the exact coordinates for this theme word
+        const coords = this._board.themeCoords[themeWord];
+        console.log(`Hint for ${themeWord} using coords:`, coords);
+        
         // Clear any existing hints
         document.querySelectorAll(".hinted").forEach(el => {
             try {
@@ -671,45 +675,25 @@ class GameBoard {
             }
         });
         
-        // COMPLETELY NEW APPROACH: Directly find and highlight the letters
-        // Get all char elements
-        const charElements = document.querySelectorAll(".char");
-        
-        // First, let's find all the letters in our theme word
-        const themeWordLetters = themeWord.split("");
-        console.log(`Will highlight letters: ${themeWordLetters.join(", ")}`);
-        
-        // Track which letters we've highlighted (use a Map instead of Set)
-        const highlightedLetters = new Map<string, number>();
-        
-        // Go through all chars on the board
-        charElements.forEach(el => {
-            // Get the letter content
-            const letter = el.querySelector(".inner")?.textContent?.trim();
-            
-            if (!letter) return;
-            
-            // Check if this letter is in our theme word and we haven't highlighted too many of this letter yet
-            const letterCount = themeWordLetters.filter(l => l === letter).length;
-            const highlightedCount = highlightedLetters.has(letter) ? 
-                                    highlightedLetters.get(letter) || 0 : 0;
-            
-            if (themeWordLetters.includes(letter) && highlightedCount < letterCount) {
-                // Highlight this letter
-                try {
+        // FIXED APPROACH: Only highlight the exact cells in the path
+        // Go through each coordinate in the theme word path
+        for (const [y, x] of coords) {
+            try {
+                // Find the element at this coordinate
+                // Our grid is organized as grid[y][x]
+                const el = this._grid[y][x];
+                if (el) {
+                    console.log(`Highlighting path cell at [${y},${x}]`);
                     el.classList.add("hinted");
                     const inner = el.querySelector(".inner");
                     if (inner) inner.classList.add("hinted");
-                    
-                    // Update our tracking
-                    highlightedLetters.set(letter, highlightedCount + 1);
-                    
-                    console.log(`Highlighted letter: ${letter}`);
-                } catch (e) {
-                    console.error(`Error highlighting letter: ${letter}`, e);
+                } else {
+                    console.error(`Element at [${y},${x}] not found`);
                 }
+            } catch (e) {
+                console.error(`Error highlighting coordinate [${y},${x}]`, e);
             }
-        });
+        }
         
         // Display a message about the hint
         this._mb.msg(`Hint: ${themeWord}`, "var(--color-hint)");
