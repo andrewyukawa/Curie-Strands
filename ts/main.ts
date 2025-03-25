@@ -3,6 +3,10 @@ import { whichAnimationEvent, notificationBox } from "./modules/common.js";
 import { BoardData, BoardState, defaultBoard } from "./board.js";
 import { MultiplayerClient, MultiplayerUI } from "./multi.js";
 import { BoardLoader } from "./load.js";
+import { cardiologyBoard } from "./custom-board.js";
+
+// Define a constant to check if we're in a deployed environment
+const IS_DEPLOYED = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('netlify.app');
 
 interface window extends Window {
     animationEvent: string;
@@ -168,7 +172,10 @@ class GameBoard {
         this._reloadBoard(board);
 
         this.render();
-        this._m.connect();
+        // Only try to connect to the WebSocket server if not deployed
+        if (!IS_DEPLOYED) {
+            this._m.connect();
+        }
         // console.log("Grid:", this._grid);
     }
 
@@ -631,4 +638,4 @@ class GameBoard {
 //     console.log(currentBoard);
 // });
 
-let b = new GameBoard(document.getElementById("board"), document.getElementById("clue"), document.getElementById("guess"), document.getElementById("found-text"), document.getElementById("hint-button"), document.getElementById("messagebox"), defaultBoard);
+let b = new GameBoard(document.getElementById("board"), document.getElementById("clue"), document.getElementById("guess"), document.getElementById("found-text"), document.getElementById("hint-button"), document.getElementById("messagebox"), cardiologyBoard);

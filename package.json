@@ -4,7 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "mkdir -p out && copy index.html out\\index.html && xcopy /s /i /y static out && xcopy /s /i /y node_modules\\remixicon\\fonts\\remixicon.css out && xcopy /s /i /y node_modules\\remixicon\\fonts\\remixicon.woff2 out && xcopy /s /i /y ts tempts",
+    "build": "node scripts\\replace-ws-address.js && npx esbuild --bundle base.css --outfile=out\\bundle.css --external:remixicon.css --external:../fonts/hanken* --external:../fonts/NeverMind* --minify && npx esbuild --target=es6 --bundle tempts\\main.ts --sourcemap --outfile=out\\main.js --minify && npx tailwindcss -c tailwind.config.js -i out\\bundle.css -o out\\bundle.css",
+    "postbuild": "xcopy /s /i /y images\\src\\*.svg out",
+    "start": "npx live-server out",
+    "vercel-build": "mkdir -p out && cp index.html out/index.html && cp -r static/* out/ && cp -r node_modules/remixicon/fonts/remixicon.css node_modules/remixicon/fonts/remixicon.woff2 out/ && cp -r ts tempts && WS_ADDRESS=wss://filaments-custom.vercel.app/socket node scripts/replace-ws-address.js && npx esbuild --bundle base.css --outfile=out/bundle.css --external:remixicon.css --external:../fonts/hanken* --external:../fonts/NeverMind* --minify && npx esbuild --target=es6 --bundle tempts/main.ts --sourcemap --outfile=out/main.js --minify && npx tailwindcss -c tailwind.config.js -i out/bundle.css -o out/bundle.css && cp -r images/src/*.svg out/"
   },
   "author": "Harvey Tindall <hrfee@hrfee.dev>",
   "license": "MIT",
