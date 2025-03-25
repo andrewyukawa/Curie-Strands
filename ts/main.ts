@@ -639,7 +639,7 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        console.log("Starting hint system with corrected coordinates...");
+        console.log("Starting completely redesigned hint system...");
         
         // First check if there are any unfound theme words
         let unfoundThemeWords = [];
@@ -661,30 +661,55 @@ class GameBoard {
         console.log("Selected theme word for hint:", themeWord);
         
         // Clear any existing hints
-        for (let y = 0; y < this._grid.length; y++) {
-            for (let x = 0; x < this._grid[y].length; x++) {
-                this.rmClass(this._grid[y][x], "hinted");
-            }
-        }
-        
-        // Get the coordinates for this theme word
-        const coords = this._board.themeCoords[themeWord];
-        console.log(`Theme word "${themeWord}" coordinates:`, coords);
-        
-        // Add highlights for the theme word coordinates
-        for (const [y, x] of coords) {
+        document.querySelectorAll(".hinted").forEach(el => {
             try {
-                const el = this._grid[y][x];
-                if (el) {
-                    console.log(`Highlighting cell at [${y},${x}]`);
-                    this.addClass(el, "hinted");
-                } else {
-                    console.error(`Element at [${y},${x}] is undefined`);
-                }
-            } catch (error) {
-                console.error(`Error highlighting cell at [${y},${x}]`, error);
+                el.classList.remove("hinted");
+                const inner = el.querySelector(".inner");
+                if (inner) inner.classList.remove("hinted");
+            } catch (e) {
+                console.error("Error clearing hints", e);
             }
-        }
+        });
+        
+        // COMPLETELY NEW APPROACH: Directly find and highlight the letters
+        // Get all char elements
+        const charElements = document.querySelectorAll(".char");
+        
+        // First, let's find all the letters in our theme word
+        const themeWordLetters = themeWord.split("");
+        console.log(`Will highlight letters: ${themeWordLetters.join(", ")}`);
+        
+        // Track which letters we've highlighted (use a Map instead of Set)
+        const highlightedLetters = new Map<string, number>();
+        
+        // Go through all chars on the board
+        charElements.forEach(el => {
+            // Get the letter content
+            const letter = el.querySelector(".inner")?.textContent?.trim();
+            
+            if (!letter) return;
+            
+            // Check if this letter is in our theme word and we haven't highlighted too many of this letter yet
+            const letterCount = themeWordLetters.filter(l => l === letter).length;
+            const highlightedCount = highlightedLetters.has(letter) ? 
+                                    highlightedLetters.get(letter) || 0 : 0;
+            
+            if (themeWordLetters.includes(letter) && highlightedCount < letterCount) {
+                // Highlight this letter
+                try {
+                    el.classList.add("hinted");
+                    const inner = el.querySelector(".inner");
+                    if (inner) inner.classList.add("hinted");
+                    
+                    // Update our tracking
+                    highlightedLetters.set(letter, highlightedCount + 1);
+                    
+                    console.log(`Highlighted letter: ${letter}`);
+                } catch (e) {
+                    console.error(`Error highlighting letter: ${letter}`, e);
+                }
+            }
+        });
         
         // Display a message about the hint
         this._mb.msg(`Hint: ${themeWord}`, "var(--color-hint)");
@@ -693,7 +718,49 @@ class GameBoard {
         this._wordsRemainingForHint = this.wordsToGetHint;
         this.updateWordCount();
         
-        console.log("Hint system completed");
+        console.log(`Hint for ${themeWord} completed`);
+    }
+    
+    private _debugGrid() {
+        console.log("=== DEBUG GRID ===");
+        
+        // Print board structure
+        console.log("Board Structure:");
+        for (let y = 0; y < this._board.startingBoard.length; y++) {
+            console.log(`Row ${y}: ${this._board.startingBoard[y]}`);
+        }
+        
+        // Print grid element access
+        console.log("\nGrid Element Access:");
+        for (let y = 0; y < this._grid.length; y++) {
+            let rowContent = `Row ${y}: `;
+            for (let x = 0; x < this._grid[y].length; x++) {
+                const el = this._grid[y][x];
+                const innerText = el.querySelector(".inner")?.textContent || "?";
+                rowContent += `[${y},${x}]=${innerText} `;
+            }
+            console.log(rowContent);
+        }
+        
+        // Check theme word coordinates
+        console.log("\nTheme Word Coordinates Check:");
+        for (const [word, coords] of Object.entries(this._board.themeCoords)) {
+            let wordFromCoords = "";
+            for (const [y, x] of coords) {
+                try {
+                    let letter = "?";
+                    if (y >= 0 && y < this._board.startingBoard.length && 
+                        x >= 0 && x < this._board.startingBoard[y].length) {
+                        letter = this._board.startingBoard[y][x];
+                    }
+                    wordFromCoords += letter;
+                } catch (error) {
+                    wordFromCoords += "?";
+                }
+            }
+            console.log(`${word}: Coords=${JSON.stringify(coords)}, Forms="${wordFromCoords}"`);
+        }
+        console.log("=== END DEBUG ===");
     }
 }
 
