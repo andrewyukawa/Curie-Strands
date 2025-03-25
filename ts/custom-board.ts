@@ -3,16 +3,16 @@ import { BoardData } from "./board.js";
 // Adding the correct spangram path from the image
 // The yellow path that spells CARDIOLOGY
 export const spangramCoords = [
-    [1, 0], // C
-    [1, 1], // A
-    [1, 2], // R
-    [3, 2], // D
-    [3, 3], // I
+    [0, 1], // C
+    [0, 2], // A
+    [0, 3], // R
+    [0, 4], // D
+    [2, 4], // I
     [3, 4], // O
-    [5, 4], // L
-    [5, 5], // O
-    [5, 6], // G
-    [7, 6]  // Y
+    [4, 4], // L
+    [4, 5], // O
+    [4, 6], // G
+    [4, 7]  // Y
 ];
 
 export const cardiologyBoard: BoardData = {
@@ -30,7 +30,7 @@ export const cardiologyBoard: BoardData = {
         "ESALVC",
         "STOLRO",
         "NEGANO",
-        "TVYROA"
+        "TYVYRA"  // Fixed from TVYROA to match the image
     ],
     solutions: [
         "CARDIOLOGY", // Spangram
