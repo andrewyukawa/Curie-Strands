@@ -639,64 +639,79 @@ class GameBoard {
     private _useHint = (remote: boolean = false) => {
         if (!remote) this._m.cli.cmdHint();
         
-        // Find a theme word that hasn't been found yet
-        let themeWord = "";
-        for (const tw in this._board.themeCoords) {
-            if (this._themeWordsFound.includes(tw)) continue;
-            themeWord = tw;
-            break;
-        }
-        
-        // If all theme words are found, return without doing anything
-        if (!themeWord) {
-            this._mb.msg("All theme words found!", "var(--color-valid)");
-            return;
-        }
-        
         // Clear any existing hints first
         for (let y = 0; y < this._board.startingBoard.length; y++) {
             for (let x = 0; x < this._board.startingBoard[y].length; x++) {
+                // Clear hint classes and connectors
                 this.rmClass(this._grid[y][x], "hinted");
-                // Also clear any hint connectors
                 const el = this._grid[y][x];
                 const connectors = el.querySelectorAll(".hint-connector");
                 connectors.forEach(conn => conn.remove());
             }
         }
         
-        // Add hints for the selected theme word only
+        // Select the next unfound theme word
+        let themeWordsToHint = [];
+        for (const tw in this._board.themeCoords) {
+            if (!this._themeWordsFound.includes(tw) && tw !== this._board.spangram) {
+                themeWordsToHint.push(tw);
+            }
+        }
+        
+        // If no theme words left to hint, show message
+        if (themeWordsToHint.length === 0) {
+            this._mb.msg("All theme words found!", "var(--color-valid)");
+            return;
+        }
+        
+        // Choose a theme word to hint (first unfound theme word)
+        const themeWord = themeWordsToHint[0];
         const coords = this._board.themeCoords[themeWord];
         
-        // First pass: add the hinted class to all letters
-        for (const c of coords) {
-            this.addClass(this._grid[c[0]][c[1]], "hinted");
-        }
+        // Highlight the theme word with animation
+        let idx = 0;
+        const highlightNextLetter = () => {
+            if (idx < coords.length) {
+                const [y, x] = coords[idx];
+                const el = this._grid[y][x];
+                
+                // Add hinted class to the letter
+                this.addClass(el, "hinted");
+                
+                // Add connector to letters (except first one)
+                if (idx > 0) {
+                    const prevCoord = coords[idx-1];
+                    
+                    // Create connector
+                    let con = document.createElement("div");
+                    con.classList.add("connector", "hint-connector");
+                    
+                    // Calculate direction
+                    let deltaY = coords[idx][0] - prevCoord[0];
+                    let deltaX = coords[idx][1] - prevCoord[1];
+                    let conClass = "";
+                    if (deltaY > 0) conClass += "u";
+                    else if (deltaY < 0) conClass += "d";
+                    if (deltaX > 0) conClass += "l";
+                    else if (deltaX < 0) conClass += "r";
+                    if (conClass !== "") con.classList.add(conClass);
+                    
+                    // Add connector to element
+                    el.appendChild(con);
+                }
+                
+                idx++;
+                setTimeout(highlightNextLetter, 100); // Slightly slower animation for better visibility
+            } else {
+                // When animation is complete, show message
+                this._mb.msg(`Hint: ${themeWord}`, "var(--color-hint)");
+            }
+        };
         
-        // Second pass: add connectors between adjacent letters
-        for (let i = 1; i < coords.length; i++) {
-            const prevCoord = coords[i-1];
-            const curCoord = coords[i];
-            const el = this._grid[curCoord[0]][curCoord[1]];
-            
-            // Add a connector between this letter and the previous one
-            let con = document.createElement("div");
-            con.classList.add("connector", "hint-connector");
-            
-            // Calculate direction from previous to current
-            let deltaY = curCoord[0] - prevCoord[0];
-            let deltaX = curCoord[1] - prevCoord[1];
-            let conClass = "";
-            if (deltaY > 0) conClass += "u";
-            else if (deltaY < 0) conClass += "d";
-            if (deltaX > 0) conClass += "l";
-            else if (deltaX < 0) conClass += "r";
-            if (conClass != "") con.classList.add(conClass);
-            
-            // Add connector to the element
-            el.appendChild(con);
-        }
+        // Start the animation
+        highlightNextLetter();
         
-        this._mb.msg(`Hint for: ${themeWord}`, "var(--color-hint)");
+        // Reset the hint counter
         this._wordsRemainingForHint = this.wordsToGetHint;
         this.updateWordCount();
     }
